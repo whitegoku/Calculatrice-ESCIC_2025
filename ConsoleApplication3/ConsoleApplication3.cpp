@@ -49,7 +49,7 @@ int stringToBase10(const char* str) {
 // Fonction pour convertir un nombre de base 10 en base 26
 char* toBase26(int num) {
     static char result[100];
-    char chars[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    char chars[] = "0123456789ABCDEFGHIJKLMNOP";
     int index = 0;
 
     do {
@@ -122,33 +122,63 @@ int evaluateBase26(const char* tokens) {
     return values[valIndex];
 }
 
-// Fonction principale
-int main() {
-    char expression[100];
-    while (1) {
-        printf("Entrez l'expression en base 26 (ou 'exit' pour quitter): ");
-        fgets(expression, 100, stdin);
-
-        // Supprimer le '\n' à la fin de l'entrée
-        expression[strcspn(expression, "\n")] = '\0';
-
-        if (strcmp(expression, "exit") == 0) break;
-
-        int resultBase10 = evaluateBase26(expression);
-        printf("Résultat en base 10: %d\n", resultBase10);
-        printf("Résultat en base 26: %s\n", toBase26(resultBase10));
+// Fonction pour lire un fichier texte et évaluer les expressions en base 26
+void lireFichierEtCalculer(const char* nomFichier) {
+    FILE* fichier = fopen(nomFichier, "r");
+    if (fichier == NULL) {
+        fprintf(stderr, "Erreur : Impossible d'ouvrir le fichier %s\n", nomFichier);
+        return;
     }
-    return 0;
+
+    char ligne[256];
+    while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
+        // Supprimer le '\n' à la fin de l'entrée
+        ligne[strcspn(ligne, "\n")] = '\0';
+
+        int resultBase10 = evaluateBase26(ligne);
+        printf("Expression : %s\n", ligne);
+        printf("Résultat en base 10: %d\n", resultBase10);
+        printf("Résultat en base 26: %s\n\n", toBase26(resultBase10));
+    }
+
+    fclose(fichier);
 }
 
+// Fonction principale
+int main() {
+    char choix[3];
+    char expression[100];
+    const char* nomFichier = "fichier.txt";
 
-// Exécuter le programme : Ctrl+F5 ou menu Déboguer > Exécuter sans débogage
-// Déboguer le programme : F5 ou menu Déboguer > Démarrer le débogage
+    while (1) {
+        printf("Choisissez une option :\n");
+        printf("1. Entrer une expression en base 26\n");
+        printf("2. Lire les expressions d'un fichier\n");
+        printf("3. Quitter\n");
+        printf("Votre choix : ");
+        fgets(choix, sizeof(choix), stdin);
 
-// Astuces pour bien démarrer : 
-//   1. Utilisez la fenêtre Explorateur de solutions pour ajouter des fichiers et les gérer.
-//   2. Utilisez la fenêtre Team Explorer pour vous connecter au contrôle de code source.
-//   3. Utilisez la fenêtre Sortie pour voir la sortie de la génération et d'autres messages.
-//   4. Utilisez la fenêtre Liste d'erreurs pour voir les erreurs.
-//   5. Accédez à Projet > Ajouter un nouvel élément pour créer des fichiers de code, ou à Projet > Ajouter un élément existant pour ajouter des fichiers de code existants au projet.
-//   6. Pour rouvrir ce projet plus tard, accédez à Fichier > Ouvrir > Projet et sélectionnez le fichier .sln.
+        if (choix[0] == '1') {
+            printf("Entrez l'expression en base 26 : ");
+            fgets(expression, sizeof(expression), stdin);
+
+            // Supprimer le '\n' à la fin de l'entrée
+            expression[strcspn(expression, "\n")] = '\0';
+
+            int resultBase10 = evaluateBase26(expression);
+            printf("Résultat en base 10: %d\n", resultBase10);
+            printf("Résultat en base 26: %s\n\n", toBase26(resultBase10));
+        }
+        else if (choix[0] == '2') {
+            lireFichierEtCalculer(nomFichier);
+        }
+        else if (choix[0] == '3') {
+            break;
+        }
+        else {
+            printf("Choix invalide. Veuillez réessayer.\n\n");
+        }
+    }
+
+    return 0;
+}
